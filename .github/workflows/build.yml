@@ -17,5 +17,5 @@ jobs:
       - name: Archive production artifacts
         uses: actions/upload-artifact@v1
         with:
-          name: test.wasm
-          path: test.wasm
+          name: break_iterator.wasm
+          path: break_iterator.wasm
