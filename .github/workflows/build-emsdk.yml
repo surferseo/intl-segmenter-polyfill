@@ -1,0 +1,20 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [master]
+    paths: 'Dockerfile.emsdk'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Publish EMSDK docker to Registry
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: surferseo/emsdk
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          dockerfile: Dockerfile.emsdk

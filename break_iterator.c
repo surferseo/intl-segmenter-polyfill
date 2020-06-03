@@ -13,7 +13,8 @@ typedef void array_push(int32_t, int32_t, int32_t);
 
 extern array_push push;
 
-void doit(const char* locale, const char* cStringToExamine, int32_t len) {
+void break_iterator(const char* locale, const char* cStringToExamine,
+                    int32_t len) {
   UErrorCode status = U_ZERO_ERROR;
 
   udata_setCommonData(icudt67l_dat, &status);
@@ -37,4 +38,5 @@ void doit(const char* locale, const char* cStringToExamine, int32_t len) {
   ubrk_close(break_iterator);
 }
 
+// for WASI _start function to be generated
 int main() { return 0; }
