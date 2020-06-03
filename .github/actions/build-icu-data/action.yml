@@ -1,6 +1,0 @@
-name: 'Build ICU data'
-description: 'Builds data.h containing icu.dat file'
-
-runs:
-  using: 'docker'
-  image: 'Dockerfile'
