@@ -1,8 +1,3 @@
-const fs = require('fs')
-
-const wasmBuffer = fs.readFileSync('./out/test.wasm')
-let wasmBinary = new Uint8Array(wasmBuffer)
-
 const createIntlSegmenterPolyfill = async (wasmBinary) => {
   let breaks
 

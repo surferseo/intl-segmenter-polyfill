@@ -1,5 +1,7 @@
 FROM surferseo/emsdk
 
+RUN apt-get update && apt-get install -y git
+
 WORKDIR /
 RUN git clone https://github.com/unicode-org/icu
 RUN cd /icu && git checkout bb7b8481bdce7eb8ac40b3dbfd0a567b3c754cd6
