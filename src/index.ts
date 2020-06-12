@@ -20,9 +20,9 @@ const createIntlSegmenterPolyfill = async (
   let breaks: [number, number, number][]
 
   // node env does not support instantiateStreaming
-  // const instantiate =
-  //   WebAssembly.instantiateStreaming || WebAssembly.instantiate
-  const response = await WebAssembly.instantiate(wasm, {
+  const instantiate =
+    WebAssembly.instantiateStreaming || WebAssembly.instantiate
+  const response = await instantiate(wasm, {
     env: {
       push: (start: number, end: number, segmentType: number) => {
         breaks.push([start, end, segmentType])
@@ -67,7 +67,6 @@ const createIntlSegmenterPolyfill = async (
       breaks = []
       const [inputPtr, inputView] = allocStr(input)
       const [localePtr] = allocStr(locale)
-      console.log(this.options)
       exports.break_iterator(BREAK_TYPES[granularity], localePtr, inputPtr)
 
       exports.free(localePtr)
