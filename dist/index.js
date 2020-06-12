@@ -51,23 +51,25 @@ var getSegmentType = function (type) {
     }
 };
 var createIntlSegmenterPolyfill = function (wasm) { return __awaiter(void 0, void 0, void 0, function () {
-    var breaks, response, allocStr, Segmenter;
+    var breaks, instantiate, response, allocStr, Segmenter;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, WebAssembly.instantiate(wasm, {
-                    env: {
-                        push: function (start, end, segmentType) {
-                            breaks.push([start, end, segmentType]);
+            case 0:
+                instantiate = WebAssembly.instantiateStreaming || WebAssembly.instantiate;
+                return [4 /*yield*/, instantiate(wasm, {
+                        env: {
+                            push: function (start, end, segmentType) {
+                                breaks.push([start, end, segmentType]);
+                            },
+                            __sys_stat64: function () { }
                         },
-                        __sys_stat64: function () { }
-                    },
-                    wasi_snapshot_preview1: {
-                        proc_exit: function () { },
-                        fd_close: function () { },
-                        environ_sizes_get: function () { },
-                        environ_get: function () { }
-                    }
-                })];
+                        wasi_snapshot_preview1: {
+                            proc_exit: function () { },
+                            fd_close: function () { },
+                            environ_sizes_get: function () { },
+                            environ_get: function () { }
+                        }
+                    })];
             case 1:
                 response = _a.sent();
                 allocStr = function (str) {
@@ -93,7 +95,6 @@ var createIntlSegmenterPolyfill = function (wasm) { return __awaiter(void 0, voi
                         breaks = [];
                         var _a = allocStr(input), inputPtr = _a[0], inputView = _a[1];
                         var localePtr = allocStr(locale)[0];
-                        console.log(this.options);
                         exports.break_iterator(BREAK_TYPES[granularity], localePtr, inputPtr);
                         exports.free(localePtr);
                         exports.free(inputPtr);
