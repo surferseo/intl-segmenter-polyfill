@@ -9,4 +9,4 @@ docker run -v "$PWD/build:/opt/mount" --rm "$(docker images -q icu-data)" cp /ar
 cp break_iterator.c icu.py build/
 docker build . --file Dockerfile -t build
 
-docker run -v "$PWD:/opt/mount" --rm "$(docker images -q build)" cp /artifacts/break_iterator.wasm /opt/mount
+docker run -v "$PWD/dist:/opt/mount" --rm "$(docker images -q build)" cp /artifacts/break_iterator.wasm /opt/mount
