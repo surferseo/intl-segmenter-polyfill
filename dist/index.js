@@ -51,7 +51,7 @@ var getSegmentType = function (type) {
     }
 };
 var createIntlSegmenterPolyfill = function (wasm) { return __awaiter(void 0, void 0, void 0, function () {
-    var breaks, instantiate, response, allocStr, Segmenter;
+    var breaks, instantiate, response, allocStr;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -83,34 +83,33 @@ var createIntlSegmenterPolyfill = function (wasm) { return __awaiter(void 0, voi
                     memory.set(view);
                     return [ptr, view];
                 };
-                Segmenter = /** @class */ (function () {
-                    function Segmenter(locale, options) {
-                        this.locale = locale;
-                        this.options = options;
-                    }
-                    Segmenter.prototype.segment = function (input) {
-                        var locale = this.locale;
-                        var granularity = this.options.granularity;
-                        var exports = response.instance.exports;
-                        breaks = [];
-                        var _a = allocStr(input), inputPtr = _a[0], inputView = _a[1];
-                        var localePtr = allocStr(locale)[0];
-                        exports.break_iterator(BREAK_TYPES[granularity], localePtr, inputPtr);
-                        exports.free(localePtr);
-                        exports.free(inputPtr);
-                        var decoder = new TextDecoder();
-                        return breaks.map(function (_a) {
-                            var start = _a[0], end = _a[1], segmentType = _a[2];
-                            return ({
-                                segment: decoder.decode(inputView.slice(start, end)),
-                                index: decoder.decode(inputView.slice(0, start)).length,
-                                breakType: granularity === 'word' ? getSegmentType(segmentType) : undefined
+                return [2 /*return*/, /** @class */ (function () {
+                        function Segmenter(locale, options) {
+                            this.locale = locale;
+                            this.options = options;
+                        }
+                        Segmenter.prototype.segment = function (input) {
+                            var locale = this.locale;
+                            var granularity = this.options.granularity;
+                            var exports = response.instance.exports;
+                            breaks = [];
+                            var _a = allocStr(input), inputPtr = _a[0], inputView = _a[1];
+                            var localePtr = allocStr(locale)[0];
+                            exports.break_iterator(BREAK_TYPES[granularity], localePtr, inputPtr);
+                            exports.free(localePtr);
+                            exports.free(inputPtr);
+                            var decoder = new TextDecoder();
+                            return breaks.map(function (_a) {
+                                var start = _a[0], end = _a[1], segmentType = _a[2];
+                                return ({
+                                    segment: decoder.decode(inputView.slice(start, end)),
+                                    index: decoder.decode(inputView.slice(0, start)).length,
+                                    breakType: granularity === 'word' ? getSegmentType(segmentType) : undefined
+                                });
                             });
-                        });
-                    };
-                    return Segmenter;
-                }());
-                return [2 /*return*/, Segmenter];
+                        };
+                        return Segmenter;
+                    }())];
         }
     });
 }); };

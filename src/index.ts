@@ -50,7 +50,7 @@ const createIntlSegmenterPolyfill = async (
     return [ptr, view]
   }
 
-  class Segmenter {
+  return class Segmenter {
     locale: string
     options: { granularity: 'word' | 'grapheme' }
 
@@ -82,7 +82,6 @@ const createIntlSegmenterPolyfill = async (
       }))
     }
   }
-  return Segmenter
 }
 
 export default createIntlSegmenterPolyfill
