@@ -50,26 +50,37 @@ var getSegmentType = function (type) {
             return 'none';
     }
 };
+var instantiateWasmModule = function (wasm, imports) {
+    if (typeof wasm.then === 'function') {
+        if (WebAssembly.instantiateStreaming != null) {
+            return WebAssembly.instantiateStreaming(wasm, imports);
+        }
+        return wasm
+            .then(function (response) { return response.arrayBuffer(); })
+            .then(function (buffer) { return WebAssembly.instantiate(buffer, imports); });
+    }
+    else {
+        return WebAssembly.instantiate(wasm, imports);
+    }
+};
 var createIntlSegmenterPolyfill = function (wasm) { return __awaiter(void 0, void 0, void 0, function () {
-    var breaks, instantiate, response, allocStr;
+    var breaks, response, allocStr;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                instantiate = WebAssembly.instantiateStreaming || WebAssembly.instantiate;
-                return [4 /*yield*/, instantiate(wasm, {
-                        env: {
-                            push: function (start, end, segmentType) {
-                                breaks.push([start, end, segmentType]);
-                            },
-                            __sys_stat64: function () { }
+            case 0: return [4 /*yield*/, instantiateWasmModule(wasm, {
+                    env: {
+                        push: function (start, end, segmentType) {
+                            breaks.push([start, end, segmentType]);
                         },
-                        wasi_snapshot_preview1: {
-                            proc_exit: function () { },
-                            fd_close: function () { },
-                            environ_sizes_get: function () { },
-                            environ_get: function () { }
-                        }
-                    })];
+                        __sys_stat64: function () { }
+                    },
+                    wasi_snapshot_preview1: {
+                        proc_exit: function () { },
+                        fd_close: function () { },
+                        environ_sizes_get: function () { },
+                        environ_get: function () { }
+                    }
+                })];
             case 1:
                 response = _a.sent();
                 allocStr = function (str) {

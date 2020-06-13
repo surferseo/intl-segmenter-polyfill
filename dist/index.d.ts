@@ -1,4 +1,4 @@
-declare const createIntlSegmenterPolyfill: (wasm: Response | PromiseLike<Response>) => Promise<{
+declare const createIntlSegmenterPolyfill: (wasm: ArrayBufferLike | PromiseLike<Response>) => Promise<{
     new (locale: string, options: {
         granularity: 'word' | 'grapheme';
     }): {

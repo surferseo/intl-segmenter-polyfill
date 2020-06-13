@@ -14,15 +14,26 @@ const getSegmentType = (type: number) => {
   }
 }
 
+const instantiateWasmModule = (wasm, imports) => {
+  if (typeof wasm.then === 'function') {
+    if (WebAssembly.instantiateStreaming != null) {
+      return WebAssembly.instantiateStreaming(wasm, imports)
+    }
+
+    return wasm
+      .then((response) => response.arrayBuffer())
+      .then((buffer) => WebAssembly.instantiate(buffer, imports))
+  } else {
+    return WebAssembly.instantiate(wasm, imports)
+  }
+}
+
 const createIntlSegmenterPolyfill = async (
-  wasm: Response | PromiseLike<Response>,
+  wasm: ArrayBufferLike | PromiseLike<Response>
 ) => {
   let breaks: [number, number, number][]
 
-  // node env does not support instantiateStreaming
-  const instantiate =
-    WebAssembly.instantiateStreaming || WebAssembly.instantiate
-  const response = await instantiate(wasm, {
+  const response = await instantiateWasmModule(wasm, {
     env: {
       push: (start: number, end: number, segmentType: number) => {
         breaks.push([start, end, segmentType])
