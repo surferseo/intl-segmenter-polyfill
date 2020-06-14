@@ -4,26 +4,29 @@ import 'fast-text-encoding'
 const BREAK_TYPES = {
   grapheme: 0,
   word: 1,
+  sentence: 3
 }
 
-const getSegmentType = (type: number) => {
+const getSegmentType = (type) => {
   if (type < 100) {
-    return 'none' as const
+    return 'none'
   } else if (type >= 100 && type < 200) {
-    return 'number' as const
+    return 'number'
   } else if (type >= 200 && type < 300) {
-    return 'word' as const
+    return 'word'
   } else if (type >= 300 && type < 400) {
-    return 'kana' as const
+    return 'kana'
   } else if (type >= 400 && type < 500) {
-    return 'ideo' as const
+    return 'ideo'
   }
 }
 
 const instantiateWasmModule = (wasm, imports) => {
   if (typeof wasm.then === 'function') {
     if (WebAssembly.instantiateStreaming != null) {
-      return wasm.then(response => WebAssembly.instantiateStreaming(response, imports))
+      return wasm.then((response) =>
+        WebAssembly.instantiateStreaming(response, imports)
+      )
     }
 
     return wasm
@@ -34,32 +37,16 @@ const instantiateWasmModule = (wasm, imports) => {
   }
 }
 
-const createIntlSegmenterPolyfill = async (
-  wasm: ArrayBufferLike | PromiseLike<Response>
+const createIntlSegmenterPolyfillFromInstance = async (
+  wasmInstance,
+  values,
 ) => {
-  let breaks: [number, number, number][]
-
-  const response = await instantiateWasmModule(wasm, {
-    env: {
-      push: (start: number, end: number, segmentType: number) => {
-        breaks.push([start, end, segmentType])
-      },
-      __sys_stat64: () => {},
-    },
-    wasi_snapshot_preview1: {
-      proc_exit: () => {},
-      fd_close: () => {},
-      environ_sizes_get: () => {},
-      environ_get: () => {},
-    },
-  })
-
-  const allocStr = (str: string) => {
+  const allocStr = (str) => {
     const encoder = new TextEncoder()
     const view = encoder.encode(str + '\0')
     // typescript does not play well with webassembly
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const exports = ((response as any).instance.exports as unknown) as any
+    const exports = wasmInstance.exports
 
     const ptr = exports.malloc(view.length)
     const memory = new Uint8Array(exports.memory.buffer, ptr, view.length)
@@ -68,20 +55,20 @@ const createIntlSegmenterPolyfill = async (
   }
 
   return class Segmenter {
-    locale: string
-    options: { granularity: 'word' | 'grapheme' }
+    locale
+    options
 
-    constructor(locale: string, options: { granularity: 'word' | 'grapheme' }) {
+    constructor(locale, options) {
       this.locale = locale
       this.options = options
     }
 
-    segment(input: string) {
+    segment(input) {
       const locale = this.locale
       const granularity = this.options.granularity
-      const exports = ((response as any).instance.exports as unknown) as any
+      const exports = wasmInstance.exports
 
-      breaks = []
+      values.current = []
       const [inputPtr, inputView] = allocStr(input)
       const [localePtr] = allocStr(locale)
       exports.break_iterator(BREAK_TYPES[granularity], localePtr, inputPtr)
@@ -91,10 +78,13 @@ const createIntlSegmenterPolyfill = async (
 
       const decoder = new TextDecoder()
 
-      return breaks.map(([start, end, segmentType]) => ({
+      return values.current.map(([start, end, segmentType]) => ({
         segment: decoder.decode(inputView.slice(start, end)),
         index: decoder.decode(inputView.slice(0, start)).length,
-        isWordLike: granularity === 'word' ? getSegmentType(segmentType) !== 'none' : undefined,
+        isWordLike:
+          granularity === 'word'
+            ? getSegmentType(segmentType) !== 'none'
+            : undefined,
         breakType:
           granularity === 'word' ? getSegmentType(segmentType) : undefined,
       }))
@@ -102,4 +92,45 @@ const createIntlSegmenterPolyfill = async (
   }
 }
 
-export default createIntlSegmenterPolyfill
+const getImports = (callback) => ({
+  env: {
+    push: (start, end, segmentType) => {
+      callback([start, end, segmentType])
+    },
+    __sys_stat64: () => {},
+  },
+  wasi_snapshot_preview1: {
+    proc_exit: () => {},
+    fd_close: () => {},
+    environ_sizes_get: () => {},
+    environ_get: () => {},
+  },
+})
+
+export const createIntlSegmenterPolyfillFromFactory = async (
+  wasmFactory
+) => {
+  let values = { current: [] }
+  const {instance} = await wasmFactory(
+    getImports((value) => {
+      values.current.push(value)
+    })
+  )
+
+  return createIntlSegmenterPolyfillFromInstance(instance, values)
+}
+
+export const createIntlSegmenterPolyfill = async (
+  wasm
+) => {
+  let values = { current: [] }
+
+  const {instance} = await instantiateWasmModule(
+    wasm,
+    getImports((value) => {
+      values.current.push(value)
+    })
+  )
+
+  return createIntlSegmenterPolyfillFromInstance(instance, values)
+}

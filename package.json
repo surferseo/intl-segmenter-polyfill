@@ -1,6 +1,6 @@
 {
   "name": "intl-segmenter-polyfill",
-  "version": "0.2.8",
+  "version": "0.3.0",
   "description": "This repo builds .wasm module using icu4c for breaking text into words, so that we can polyfill [Intl Segmenter Proposal](https://github.com/tc39/proposal-intl-segmenter) with full compatibility, even on browsers that do not expose v8BreakIterator api.",
   "main": "dist/index.js",
   "files": [
@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "prepublish": "npm run build",
-    "build": "tsc -d --outDir dist src/index.ts"
+    "build": "cp src/break_iterator.wasm dist/ && rollup -c rollup.config.js && rollup -c rollup.config.bundled.js"
   },
   "repository": {
     "type": "git",
@@ -22,7 +22,8 @@
   },
   "homepage": "https://github.com/surferseo/intl-segmenter-polyfill#readme",
   "devDependencies": {
-    "typescript": "^3.9.5"
+    "@rollup/plugin-wasm": "^5.0.0",
+    "rollup": "^2.16.1"
   },
   "dependencies": {
     "fast-text-encoding": "^1.0.2"

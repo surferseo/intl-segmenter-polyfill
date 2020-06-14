@@ -1,137 +1,148 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-exports.__esModule = true;
-// polyfill TextEncoder and TextDecoder, which is missing on Edge 18
-require("fast-text-encoding");
-var BREAK_TYPES = {
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('fast-text-encoding')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'fast-text-encoding'], factory) :
+  (global = global || self, factory(global.IntlSegmenterPolyfill = {}));
+}(this, (function (exports) { 'use strict';
+
+  // polyfill TextEncoder and TextDecoder, which is missing on Edge 18
+
+  const BREAK_TYPES = {
     grapheme: 0,
-    word: 1
-};
-var getSegmentType = function (type) {
+    word: 1,
+    sentence: 3
+  };
+
+  const getSegmentType = (type) => {
     if (type < 100) {
-        return 'none';
+      return 'none'
+    } else if (type >= 100 && type < 200) {
+      return 'number'
+    } else if (type >= 200 && type < 300) {
+      return 'word'
+    } else if (type >= 300 && type < 400) {
+      return 'kana'
+    } else if (type >= 400 && type < 500) {
+      return 'ideo'
     }
-    else if (type >= 100 && type < 200) {
-        return 'number';
-    }
-    else if (type >= 200 && type < 300) {
-        return 'word';
-    }
-    else if (type >= 300 && type < 400) {
-        return 'kana';
-    }
-    else if (type >= 400 && type < 500) {
-        return 'ideo';
-    }
-};
-var instantiateWasmModule = function (wasm, imports) {
+  };
+
+  const instantiateWasmModule = (wasm, imports) => {
     if (typeof wasm.then === 'function') {
-        if (WebAssembly.instantiateStreaming != null) {
-            return wasm.then(function (response) { return WebAssembly.instantiateStreaming(response, imports); });
-        }
-        return wasm
-            .then(function (response) { return response.arrayBuffer(); })
-            .then(function (buffer) { return WebAssembly.instantiate(buffer, imports); });
+      if (WebAssembly.instantiateStreaming != null) {
+        return wasm.then((response) =>
+          WebAssembly.instantiateStreaming(response, imports)
+        )
+      }
+
+      return wasm
+        .then((response) => response.arrayBuffer())
+        .then((buffer) => WebAssembly.instantiate(buffer, imports))
+    } else {
+      return WebAssembly.instantiate(wasm, imports)
     }
-    else {
-        return WebAssembly.instantiate(wasm, imports);
+  };
+
+  const createIntlSegmenterPolyfillFromInstance = async (
+    wasmInstance,
+    values,
+  ) => {
+    const allocStr = (str) => {
+      const encoder = new TextEncoder();
+      const view = encoder.encode(str + '\0');
+      // typescript does not play well with webassembly
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const exports = wasmInstance.exports;
+
+      const ptr = exports.malloc(view.length);
+      const memory = new Uint8Array(exports.memory.buffer, ptr, view.length);
+      memory.set(view);
+      return [ptr, view]
+    };
+
+    return class Segmenter {
+      locale
+      options
+
+      constructor(locale, options) {
+        this.locale = locale;
+        this.options = options;
+      }
+
+      segment(input) {
+        const locale = this.locale;
+        const granularity = this.options.granularity;
+        const exports = wasmInstance.exports;
+
+        values.current = [];
+        const [inputPtr, inputView] = allocStr(input);
+        const [localePtr] = allocStr(locale);
+        exports.break_iterator(BREAK_TYPES[granularity], localePtr, inputPtr);
+
+        exports.free(localePtr);
+        exports.free(inputPtr);
+
+        const decoder = new TextDecoder();
+
+        return values.current.map(([start, end, segmentType]) => ({
+          segment: decoder.decode(inputView.slice(start, end)),
+          index: decoder.decode(inputView.slice(0, start)).length,
+          isWordLike:
+            granularity === 'word'
+              ? getSegmentType(segmentType) !== 'none'
+              : undefined,
+          breakType:
+            granularity === 'word' ? getSegmentType(segmentType) : undefined,
+        }))
+      }
     }
-};
-var createIntlSegmenterPolyfill = function (wasm) { return __awaiter(void 0, void 0, void 0, function () {
-    var breaks, response, allocStr;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, instantiateWasmModule(wasm, {
-                    env: {
-                        push: function (start, end, segmentType) {
-                            breaks.push([start, end, segmentType]);
-                        },
-                        __sys_stat64: function () { }
-                    },
-                    wasi_snapshot_preview1: {
-                        proc_exit: function () { },
-                        fd_close: function () { },
-                        environ_sizes_get: function () { },
-                        environ_get: function () { }
-                    }
-                })];
-            case 1:
-                response = _a.sent();
-                allocStr = function (str) {
-                    var encoder = new TextEncoder();
-                    var view = encoder.encode(str + '\0');
-                    // typescript does not play well with webassembly
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    var exports = response.instance.exports;
-                    var ptr = exports.malloc(view.length);
-                    var memory = new Uint8Array(exports.memory.buffer, ptr, view.length);
-                    memory.set(view);
-                    return [ptr, view];
-                };
-                return [2 /*return*/, /** @class */ (function () {
-                        function Segmenter(locale, options) {
-                            this.locale = locale;
-                            this.options = options;
-                        }
-                        Segmenter.prototype.segment = function (input) {
-                            var locale = this.locale;
-                            var granularity = this.options.granularity;
-                            var exports = response.instance.exports;
-                            breaks = [];
-                            var _a = allocStr(input), inputPtr = _a[0], inputView = _a[1];
-                            var localePtr = allocStr(locale)[0];
-                            exports.break_iterator(BREAK_TYPES[granularity], localePtr, inputPtr);
-                            exports.free(localePtr);
-                            exports.free(inputPtr);
-                            var decoder = new TextDecoder();
-                            return breaks.map(function (_a) {
-                                var start = _a[0], end = _a[1], segmentType = _a[2];
-                                return ({
-                                    segment: decoder.decode(inputView.slice(start, end)),
-                                    index: decoder.decode(inputView.slice(0, start)).length,
-                                    isWordLike: granularity === 'word' ? getSegmentType(segmentType) !== 'none' : undefined,
-                                    breakType: granularity === 'word' ? getSegmentType(segmentType) : undefined
-                                });
-                            });
-                        };
-                        return Segmenter;
-                    }())];
-        }
-    });
-}); };
-exports["default"] = createIntlSegmenterPolyfill;
+  };
+
+  const getImports = (callback) => ({
+    env: {
+      push: (start, end, segmentType) => {
+        callback([start, end, segmentType]);
+      },
+      __sys_stat64: () => {},
+    },
+    wasi_snapshot_preview1: {
+      proc_exit: () => {},
+      fd_close: () => {},
+      environ_sizes_get: () => {},
+      environ_get: () => {},
+    },
+  });
+
+  const createIntlSegmenterPolyfillFromFactory = async (
+    wasmFactory
+  ) => {
+    let values = { current: [] };
+    const {instance} = await wasmFactory(
+      getImports((value) => {
+        values.current.push(value);
+      })
+    );
+
+    return createIntlSegmenterPolyfillFromInstance(instance, values)
+  };
+
+  const createIntlSegmenterPolyfill = async (
+    wasm
+  ) => {
+    let values = { current: [] };
+
+    const {instance} = await instantiateWasmModule(
+      wasm,
+      getImports((value) => {
+        values.current.push(value);
+      })
+    );
+
+    return createIntlSegmenterPolyfillFromInstance(instance, values)
+  };
+
+  exports.createIntlSegmenterPolyfill = createIntlSegmenterPolyfill;
+  exports.createIntlSegmenterPolyfillFromFactory = createIntlSegmenterPolyfillFromFactory;
+
+  Object.defineProperty(exports, '__esModule', { value: true });
+
+})));
