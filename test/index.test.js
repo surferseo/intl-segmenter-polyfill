@@ -3,7 +3,7 @@ test('Bundled module', async () => {
   const segments = new Segmenter('en', { granularity: 'word' }).segment(
     'foo bar'
   )
-  expect(segments).toEqual([
+  expect(Array.from(segments)).toEqual([
     { breakType: 'word', index: 0, isWordLike: true, segment: 'foo' },
     { breakType: 'none', index: 3, isWordLike: false, segment: ' ' },
     { breakType: 'word', index: 4, isWordLike: true, segment: 'bar' },
@@ -21,11 +21,23 @@ test('FS loaded module', async () => {
   const segments = new Segmenter('en', { granularity: 'word' }).segment(
     'foo bar'
   )
-  expect(segments).toEqual([
+  expect(Array.from(segments)).toEqual([
     { breakType: 'word', index: 0, isWordLike: true, segment: 'foo' },
     { breakType: 'none', index: 3, isWordLike: false, segment: ' ' },
     { breakType: 'word', index: 4, isWordLike: true, segment: 'bar' },
   ])
+})
+
+test('segments.containing() direct access', async () => {
+  const Segmenter = await require('../dist/bundled.js').createIntlSegmenterPolyfill()
+  const segments = new Segmenter('en', { granularity: 'word' }).segment(
+    'foo bar'
+  )
+  expect(segments.containing(0).segment).toEqual('foo')
+  expect(segments.containing(1).segment).toEqual('foo')
+  expect(segments.containing(3).segment).toEqual(' ')
+  expect(segments.containing(5).segment).toEqual('bar')
+  expect(segments.containing(8)).toEqual(undefined)
 })
 
 test('Segments Thai words', async () => {

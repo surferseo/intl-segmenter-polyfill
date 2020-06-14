@@ -35,7 +35,7 @@ function _loadWasmModule (sync, src, imports) {
 	const BREAK_TYPES = {
 	  grapheme: 0,
 	  word: 1,
-	  sentence: 3
+	  sentence: 3,
 	};
 
 	const getSegmentType = (type) => {
@@ -54,7 +54,7 @@ function _loadWasmModule (sync, src, imports) {
 
 	const createIntlSegmenterPolyfillFromInstance = async (
 	  wasmInstance,
-	  values,
+	  values
 	) => {
 	  const allocStr = (str) => {
 	    const encoder = new TextEncoder();
@@ -90,7 +90,7 @@ function _loadWasmModule (sync, src, imports) {
 
 	      const decoder = new TextDecoder();
 
-	      return values.current.map(([start, end, segmentType]) => ({
+	      const segments = values.current.map(([start, end, segmentType]) => ({
 	        segment: decoder.decode(inputView.slice(start, end)),
 	        index: decoder.decode(inputView.slice(0, start)).length,
 	        isWordLike:
@@ -99,7 +99,15 @@ function _loadWasmModule (sync, src, imports) {
 	            : undefined,
 	        breakType:
 	          granularity === 'word' ? getSegmentType(segmentType) : undefined,
-	      }))
+	      }));
+
+	      segments.containing = (indexToFind) =>
+	        segments.find(
+	          ({ index, segment }) =>
+	            indexToFind >= index && indexToFind <= index + segment.length - 1
+	        );
+
+	      return segments
 	    }
 	  }
 	};
@@ -119,11 +127,9 @@ function _loadWasmModule (sync, src, imports) {
 	  },
 	});
 
-	const createIntlSegmenterPolyfillFromFactory = async (
-	  wasmFactory
-	) => {
+	const createIntlSegmenterPolyfillFromFactory = async (wasmFactory) => {
 	  let values = { current: [] };
-	  const {instance} = await wasmFactory(
+	  const { instance } = await wasmFactory(
 	    getImports((value) => {
 	      values.current.push(value);
 	    })
@@ -133,9 +139,7 @@ function _loadWasmModule (sync, src, imports) {
 	};
 
 	const createIntlSegmenterPolyfill = () => {
-	  return createIntlSegmenterPolyfillFromFactory(
-	    break_iterator
-	  )
+	  return createIntlSegmenterPolyfillFromFactory(break_iterator)
 	};
 
 	exports.createIntlSegmenterPolyfill = createIntlSegmenterPolyfill;

@@ -9,7 +9,7 @@
   const BREAK_TYPES = {
     grapheme: 0,
     word: 1,
-    sentence: 3
+    sentence: 3,
   };
 
   const getSegmentType = (type) => {
@@ -44,7 +44,7 @@
 
   const createIntlSegmenterPolyfillFromInstance = async (
     wasmInstance,
-    values,
+    values
   ) => {
     const allocStr = (str) => {
       const encoder = new TextEncoder();
@@ -80,7 +80,7 @@
 
         const decoder = new TextDecoder();
 
-        return values.current.map(([start, end, segmentType]) => ({
+        const segments = values.current.map(([start, end, segmentType]) => ({
           segment: decoder.decode(inputView.slice(start, end)),
           index: decoder.decode(inputView.slice(0, start)).length,
           isWordLike:
@@ -89,7 +89,15 @@
               : undefined,
           breakType:
             granularity === 'word' ? getSegmentType(segmentType) : undefined,
-        }))
+        }));
+
+        segments.containing = (indexToFind) =>
+          segments.find(
+            ({ index, segment }) =>
+              indexToFind >= index && indexToFind <= index + segment.length - 1
+          );
+
+        return segments
       }
     }
   };
@@ -109,11 +117,9 @@
     },
   });
 
-  const createIntlSegmenterPolyfillFromFactory = async (
-    wasmFactory
-  ) => {
+  const createIntlSegmenterPolyfillFromFactory = async (wasmFactory) => {
     let values = { current: [] };
-    const {instance} = await wasmFactory(
+    const { instance } = await wasmFactory(
       getImports((value) => {
         values.current.push(value);
       })
@@ -122,12 +128,10 @@
     return createIntlSegmenterPolyfillFromInstance(instance, values)
   };
 
-  const createIntlSegmenterPolyfill = async (
-    wasm
-  ) => {
+  const createIntlSegmenterPolyfill = async (wasm) => {
     let values = { current: [] };
 
-    const {instance} = await instantiateWasmModule(
+    const { instance } = await instantiateWasmModule(
       wasm,
       getImports((value) => {
         values.current.push(value);
