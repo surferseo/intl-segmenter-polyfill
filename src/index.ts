@@ -20,7 +20,7 @@ const getSegmentType = (type: number) => {
 const instantiateWasmModule = (wasm, imports) => {
   if (typeof wasm.then === 'function') {
     if (WebAssembly.instantiateStreaming != null) {
-      return WebAssembly.instantiateStreaming(wasm, imports)
+      return wasm.then(response => WebAssembly.instantiateStreaming(response, imports))
     }
 
     return wasm

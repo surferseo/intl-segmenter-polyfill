@@ -60,7 +60,7 @@ var getSegmentType = function (type) {
 var instantiateWasmModule = function (wasm, imports) {
     if (typeof wasm.then === 'function') {
         if (WebAssembly.instantiateStreaming != null) {
-            return WebAssembly.instantiateStreaming(wasm, imports);
+            return wasm.then(function (response) { return WebAssembly.instantiateStreaming(response, imports); });
         }
         return wasm
             .then(function (response) { return response.arrayBuffer(); })
