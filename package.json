@@ -9,7 +9,8 @@
   ],
   "scripts": {
     "prepublish": "npm run build",
-    "build": "cp src/break_iterator.wasm dist/ && rollup -c rollup.config.js && rollup -c rollup.config.bundled.js"
+    "build": "cp src/break_iterator.wasm dist/ && rollup -c rollup.config.js && rollup -c rollup.config.bundled.js",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,7 @@
   "homepage": "https://github.com/surferseo/intl-segmenter-polyfill#readme",
   "devDependencies": {
     "@rollup/plugin-wasm": "^5.0.0",
+    "jest": "^26.0.1",
     "rollup": "^2.16.1"
   },
   "dependencies": {

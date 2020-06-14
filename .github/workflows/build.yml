@@ -1,21 +1,23 @@
 name: Build WASM
 
-on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+on: push
 
 jobs:
   build:
+    needs:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
       - name: Build WASM
         run: ./build.sh
+      - name: Install modules
+        run: npm install
+      - name: Run tests
+        run: npm run test
       - name: Archive production artifacts
         uses: actions/upload-artifact@v1
         with:
           name: break_iterator.wasm
           path: dist/break_iterator.wasm
+
