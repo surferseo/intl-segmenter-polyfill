@@ -13,10 +13,9 @@ jobs:
       - name: Install modules
         run: npm install
       - name: Run tests
-        run: npm run test
+        run: npm run build && npm run test
       - name: Archive production artifacts
         uses: actions/upload-artifact@v1
         with:
           name: break_iterator.wasm
           path: dist/break_iterator.wasm
-
