@@ -1,3 +1,4 @@
+import babel from '@rollup/plugin-babel'
 import wasm from '@rollup/plugin-wasm'
 
 export default {
@@ -7,5 +8,5 @@ export default {
     format: 'umd',
     name: 'IntlSegmenterPolyfillBundled',
   },
-  plugins: [wasm()],
+  plugins: [wasm(), babel({ babelHelpers: 'runtime' })],
 }
