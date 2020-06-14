@@ -5,9 +5,7 @@ const wasmBuffer = fs.readFileSync('../dist/break_iterator.wasm')
 let wasmBinary = new Uint8Array(wasmBuffer)
 
 ;(async () => {
-  const encoder = new TextEncoder()
   const Segmenter = await createIntlSegmenterPolyfill(wasmBinary)
-
   const thai = fs.readFileSync('./thai.txt', 'utf-8')
 
   console.log(
@@ -17,12 +15,11 @@ let wasmBinary = new Uint8Array(wasmBuffer)
   )
 
   const wiki = fs.readFileSync('./wikipedia.txt', 'utf-8')
-  view = encoder.encode(wiki)
 
   const hrstart = process.hrtime()
 
   console.log(
-    new Segmenter('th', { granularity: 'word' })
+    new Segmenter('en', { granularity: 'word' })
       .segment(wiki)
       .filter(({ isWordLike }) => isWordLike),
   )
