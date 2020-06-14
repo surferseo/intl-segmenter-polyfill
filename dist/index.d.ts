@@ -1,3 +1,4 @@
+import 'fast-text-encoding';
 declare const createIntlSegmenterPolyfill: (wasm: ArrayBufferLike | PromiseLike<Response>) => Promise<{
     new (locale: string, options: {
         granularity: 'word' | 'grapheme';

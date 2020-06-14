@@ -1,3 +1,6 @@
+// polyfill TextEncoder and TextDecoder, which is missing on Edge 18
+import 'fast-text-encoding'
+
 const BREAK_TYPES = {
   grapheme: 0,
   word: 1,
