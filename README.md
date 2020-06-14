@@ -1,6 +1,6 @@
 # Intl Segmenter Polyfill
 
-[![npm version](https://badge.fury.io/js/intl-segmenter-polyfill.svg)](https://badge.fury.io/js/intl-segmenter-polyfill)
+[![npm version](https://badge.fury.io/js/intl-segmenter-polyfill.svg)](https://www.npmjs.com/package/intl-segmenter-polyfill)
 ![Build WASM](https://github.com/surferseo/intl-segmenter-polyfill/workflows/Build%20WASM/badge.svg)
 ![Test](https://github.com/surferseo/intl-segmenter-polyfill/workflows/Test/badge.svg)
 
