@@ -1,6 +1,8 @@
 # Intl Segmenter Polyfill
 
-[![](https://img.shields.io/badge/npm-0.2.8-blue)](https://www.npmjs.com/package/intl-segmenter-polyfill)
+[![npm version](https://badge.fury.io/js/intl-segmenter-polyfill.svg)](https://badge.fury.io/js/intl-segmenter-polyfill)
+![Build WASM](https://github.com/surferseo/intl-segmenter-polyfill/workflows/Build%20WASM/badge.svg)
+![Test](https://github.com/surferseo/intl-segmenter-polyfill/workflows/Test/badge.svg)
 
 Provides .wasm module built with icu4c for breaking text into words, so that we can polyfill [Intl Segmenter Proposal](https://github.com/tc39/proposal-intl-segmenter) with full compatibility, even on browsers that do not expose v8BreakIterator api.
 
