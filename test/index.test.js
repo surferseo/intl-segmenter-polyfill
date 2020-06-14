@@ -40,6 +40,47 @@ test('segments.containing() direct access', async () => {
   expect(segments.containing(8)).toEqual(undefined)
 })
 
+test('segment by grapheme', async () => {
+  const Segmenter = await require('../dist/bundled.js').createIntlSegmenterPolyfill()
+  const segments = new Segmenter('en', { granularity: 'grapheme' }).segment(
+    'foo bar'
+  )
+  expect(segments.map(({ segment }) => segment)).toEqual([
+    'f',
+    'o',
+    'o',
+    ' ',
+    'b',
+    'a',
+    'r',
+  ])
+})
+
+test('defaults to grapheme segmenting', async () => {
+  const Segmenter = await require('../dist/bundled.js').createIntlSegmenterPolyfill()
+  const segments = new Segmenter('en').segment('foo bar')
+  expect(segments.map(({ segment }) => segment)).toEqual([
+    'f',
+    'o',
+    'o',
+    ' ',
+    'b',
+    'a',
+    'r',
+  ])
+})
+
+test('segment by sentence', async () => {
+  const Segmenter = await require('../dist/bundled.js').createIntlSegmenterPolyfill()
+  const segments = new Segmenter('en', { granularity: 'sentence' }).segment(
+    'Foo bar. Foo bar.'
+  )
+  expect(segments.map(({ segment }) => segment)).toEqual([
+    'Foo bar. ',
+    'Foo bar.',
+  ])
+})
+
 test('Segments Thai words', async () => {
   const Segmenter = await require('../dist/bundled.js').createIntlSegmenterPolyfill()
   const segments = new Segmenter('en', { granularity: 'word' }).segment(
