@@ -70,9 +70,6 @@ function _loadWasmModule (sync, src, imports) {
 	  };
 
 	  return class Segmenter {
-	    locale
-	    options
-
 	    constructor(locale, options) {
 	      this.locale = locale;
 	      this.options = options;
