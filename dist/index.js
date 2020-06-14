@@ -41,13 +41,20 @@ var BREAK_TYPES = {
     word: 1
 };
 var getSegmentType = function (type) {
-    switch (type) {
-        case 200:
-            return 'word';
-        case 100:
-            return 'number';
-        default:
-            return 'none';
+    if (type < 100) {
+        return 'none';
+    }
+    else if (type >= 100 && type < 200) {
+        return 'number';
+    }
+    else if (type >= 200 && type < 300) {
+        return 'word';
+    }
+    else if (type >= 300 && type < 400) {
+        return 'kana';
+    }
+    else if (type >= 400 && type < 500) {
+        return 'ideo';
     }
 };
 var instantiateWasmModule = function (wasm, imports) {
@@ -115,6 +122,7 @@ var createIntlSegmenterPolyfill = function (wasm) { return __awaiter(void 0, voi
                                 return ({
                                     segment: decoder.decode(inputView.slice(start, end)),
                                     index: decoder.decode(inputView.slice(0, start)).length,
+                                    isWordLike: granularity === 'word' ? getSegmentType(segmentType) !== 'none' : undefined,
                                     breakType: granularity === 'word' ? getSegmentType(segmentType) : undefined
                                 });
                             });

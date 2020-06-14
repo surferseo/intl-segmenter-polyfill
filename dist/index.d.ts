@@ -9,7 +9,8 @@ declare const createIntlSegmenterPolyfill: (wasm: ArrayBufferLike | PromiseLike<
         segment(input: string): {
             segment: string;
             index: number;
-            breakType: "number" | "none" | "word";
+            isWordLike: boolean;
+            breakType: "number" | "none" | "word" | "kana" | "ideo";
         }[];
     };
 }>;

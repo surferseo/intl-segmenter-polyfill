@@ -13,7 +13,7 @@ let wasmBinary = new Uint8Array(wasmBuffer)
   console.log(
     new Segmenter('th', { granularity: 'word' })
       .segment(thai)
-      .filter(({ breakType }) => breakType === 'word'),
+      .filter(({ isWordLike }) => isWordLike),
   )
 
   const wiki = fs.readFileSync('./wikipedia.txt', 'utf-8')
@@ -24,7 +24,7 @@ let wasmBinary = new Uint8Array(wasmBuffer)
   console.log(
     new Segmenter('th', { granularity: 'word' })
       .segment(wiki)
-      .filter(({ breakType }) => breakType === 'word'),
+      .filter(({ isWordLike }) => isWordLike),
   )
 
   const hrend = process.hrtime(hrstart)

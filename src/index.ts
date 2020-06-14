@@ -4,13 +4,16 @@ const BREAK_TYPES = {
 }
 
 const getSegmentType = (type: number) => {
-  switch (type) {
-    case 200:
-      return 'word' as const
-    case 100:
-      return 'number' as const
-    default:
-      return 'none' as const
+  if (type < 100) {
+    return 'none' as const
+  } else if (type >= 100 && type < 200) {
+    return 'number' as const
+  } else if (type >= 200 && type < 300) {
+    return 'word' as const
+  } else if (type >= 300 && type < 400) {
+    return 'kana' as const
+  } else if (type >= 400 && type < 500) {
+    return 'ideo' as const
   }
 }
 
@@ -88,6 +91,7 @@ const createIntlSegmenterPolyfill = async (
       return breaks.map(([start, end, segmentType]) => ({
         segment: decoder.decode(inputView.slice(start, end)),
         index: decoder.decode(inputView.slice(0, start)).length,
+        isWordLike: granularity === 'word' ? getSegmentType(segmentType) !== 'none' : undefined,
         breakType:
           granularity === 'word' ? getSegmentType(segmentType) : undefined,
       }))
