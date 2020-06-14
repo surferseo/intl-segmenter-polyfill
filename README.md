@@ -20,7 +20,7 @@ This is the most efficient way as you can lazily load the wasm module only when 
 
 #### index.js
 ```js
-import { createIntlSegmenterPolyfillFromFactory } from 'intl-segmenter-polyfill'
+import { createIntlSegmenterPolyfill } from 'intl-segmenter-polyfill'
 
 (async function(){
   const Segmenter = await createIntlSegmenterPolyfill(fetch("/path/to/break_iterator.wasm"));
