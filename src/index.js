@@ -4,7 +4,7 @@ import 'fast-text-encoding'
 const BREAK_TYPES = {
   grapheme: 0,
   word: 1,
-  sentence: 3
+  sentence: 3,
 }
 
 const getSegmentType = (type) => {
@@ -39,7 +39,7 @@ const instantiateWasmModule = (wasm, imports) => {
 
 const createIntlSegmenterPolyfillFromInstance = async (
   wasmInstance,
-  values,
+  values
 ) => {
   const allocStr = (str) => {
     const encoder = new TextEncoder()
@@ -104,11 +104,9 @@ const getImports = (callback) => ({
   },
 })
 
-export const createIntlSegmenterPolyfillFromFactory = async (
-  wasmFactory
-) => {
+export const createIntlSegmenterPolyfillFromFactory = async (wasmFactory) => {
   let values = { current: [] }
-  const {instance} = await wasmFactory(
+  const { instance } = await wasmFactory(
     getImports((value) => {
       values.current.push(value)
     })
@@ -117,12 +115,10 @@ export const createIntlSegmenterPolyfillFromFactory = async (
   return createIntlSegmenterPolyfillFromInstance(instance, values)
 }
 
-export const createIntlSegmenterPolyfill = async (
-  wasm
-) => {
+export const createIntlSegmenterPolyfill = async (wasm) => {
   let values = { current: [] }
 
-  const {instance} = await instantiateWasmModule(
+  const { instance } = await instantiateWasmModule(
     wasm,
     getImports((value) => {
       values.current.push(value)

@@ -7,7 +7,5 @@ export default {
     format: 'umd',
     name: 'IntlSegmenterPolyfillBundled',
   },
-  plugins: [
-    wasm(),
-  ],
+  plugins: [wasm()],
 }

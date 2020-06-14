@@ -1,6 +1,8 @@
-test("Bundled module", async () => {
+test('Bundled module', async () => {
   const Segmenter = await require('../dist/bundled.js').createIntlSegmenterPolyfill()
-  const segments = new Segmenter('en', {granularity: 'word'}).segment("foo bar")
+  const segments = new Segmenter('en', { granularity: 'word' }).segment(
+    'foo bar'
+  )
   expect(segments).toEqual([
     { breakType: 'word', index: 0, isWordLike: true, segment: 'foo' },
     { breakType: 'none', index: 3, isWordLike: false, segment: ' ' },
@@ -8,7 +10,7 @@ test("Bundled module", async () => {
   ])
 })
 
-test("FS loaded module", async () => {
+test('FS loaded module', async () => {
   const fs = require('fs')
   const wasmBuffer = fs.readFileSync('./dist/break_iterator.wasm')
   const wasmBinary = new Uint8Array(wasmBuffer)
@@ -49,4 +51,3 @@ test('Segments Thai words', async () => {
     'ได้',
   ])
 })
-
