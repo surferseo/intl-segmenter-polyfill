@@ -62,12 +62,12 @@
     return class Segmenter {
       constructor(locale, options) {
         this.locale = locale;
-        this.options = options;
+        this.options = options || {};
       }
 
       segment(input) {
         const locale = this.locale;
-        const granularity = this.options.granularity;
+        const granularity = this.options.granularity || 'grapheme';
         const exports = wasmInstance.exports;
 
         values.current = [];
