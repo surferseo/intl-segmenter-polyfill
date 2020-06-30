@@ -96,18 +96,22 @@
                     exports.free(localePtr);
                     exports.free(inputPtr);
                     var decoder = new TextDecoder();
+                    var index = 0;
                     var segments = values.current.map(function (_ref2) {
                       var _ref3 = _slicedToArray(_ref2, 3),
                           start = _ref3[0],
                           end = _ref3[1],
                           segmentType = _ref3[2];
 
-                      return {
-                        segment: decoder.decode(inputView.slice(start, end)),
-                        index: decoder.decode(inputView.slice(0, start)).length,
+                      var segment = decoder.decode(inputView.slice(start, end));
+                      var returnValue = {
+                        segment: segment,
+                        index: index,
                         isWordLike: granularity === 'word' ? getSegmentType(segmentType) !== 'none' : undefined,
                         breakType: granularity === 'word' ? getSegmentType(segmentType) : undefined
                       };
+                      index += segment.length;
+                      return returnValue;
                     });
 
                     segments.containing = function (indexToFind) {
