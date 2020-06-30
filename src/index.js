@@ -25,7 +25,7 @@ const instantiateWasmModule = (wasm, imports) => {
   if (typeof wasm.then === 'function') {
     if (WebAssembly.instantiateStreaming != null) {
       return wasm.then((response) =>
-        WebAssembly.instantiateStreaming(response, imports)
+        WebAssembly.instantiateStreaming(response, imports),
       )
     }
 
@@ -39,7 +39,7 @@ const instantiateWasmModule = (wasm, imports) => {
 
 const createIntlSegmenterPolyfillFromInstance = async (
   wasmInstance,
-  values
+  values,
 ) => {
   const allocStr = (str) => {
     const encoder = new TextEncoder()
@@ -89,7 +89,7 @@ const createIntlSegmenterPolyfillFromInstance = async (
       segments.containing = (indexToFind) =>
         segments.find(
           ({ index, segment }) =>
-            indexToFind >= index && indexToFind <= index + segment.length - 1
+            indexToFind >= index && indexToFind <= index + segment.length - 1,
         )
 
       return segments
@@ -117,7 +117,7 @@ export const createIntlSegmenterPolyfillFromFactory = async (wasmFactory) => {
   const { instance } = await wasmFactory(
     getImports((value) => {
       values.current.push(value)
-    })
+    }),
   )
 
   return createIntlSegmenterPolyfillFromInstance(instance, values)
@@ -130,7 +130,7 @@ export const createIntlSegmenterPolyfill = async (wasm) => {
     wasm,
     getImports((value) => {
       values.current.push(value)
-    })
+    }),
   )
 
   return createIntlSegmenterPolyfillFromInstance(instance, values)
