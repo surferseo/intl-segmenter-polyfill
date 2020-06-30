@@ -74,17 +74,23 @@ const createIntlSegmenterPolyfillFromInstance = async (
       exports.free(inputPtr)
 
       const decoder = new TextDecoder()
+      let index = 0
 
-      const segments = values.current.map(([start, end, segmentType]) => ({
-        segment: decoder.decode(inputView.slice(start, end)),
-        index: decoder.decode(inputView.slice(0, start)).length,
-        isWordLike:
-          granularity === 'word'
-            ? getSegmentType(segmentType) !== 'none'
-            : undefined,
-        breakType:
-          granularity === 'word' ? getSegmentType(segmentType) : undefined,
-      }))
+      const segments = values.current.map(([start, end, segmentType]) => {
+        const segment = decoder.decode(inputView.slice(start, end))
+        const returnValue = {
+          segment,
+          index: index,
+          isWordLike:
+            granularity === 'word'
+              ? getSegmentType(segmentType) !== 'none'
+              : undefined,
+          breakType:
+            granularity === 'word' ? getSegmentType(segmentType) : undefined,
+        }
+        index += segment.length
+        return returnValue
+      })
 
       segments.containing = (indexToFind) =>
         segments.find(
