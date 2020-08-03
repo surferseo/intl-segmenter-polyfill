@@ -19,14 +19,16 @@ npm install --save intl-segmenter-polyfill
 This is the most efficient way as you can lazily load the wasm module only when you need it and use `instantiateStreaming` for the best performance. Serve `break_iterator.wasm` as a static asset with `application/wasm` content-type and you are good to go.
 
 #### index.js
+
 ```js
 import { createIntlSegmenterPolyfill } from 'intl-segmenter-polyfill'
+;(async function () {
+  const Segmenter = await createIntlSegmenterPolyfill(
+    fetch('/path/to/break_iterator.wasm'),
+  )
 
-(async function(){
-  const Segmenter = await createIntlSegmenterPolyfill(fetch("/path/to/break_iterator.wasm"));
-
-  const segmenter = new Segmenter("en", { granularity: 'word' });
-  const segments = segmenter.segment("foo bar baz");
+  const segmenter = new Segmenter('en', { granularity: 'word' })
+  const segments = segmenter.segment('foo bar baz')
 })()
 ```
 
@@ -35,14 +37,30 @@ import { createIntlSegmenterPolyfill } from 'intl-segmenter-polyfill'
 This is the simplest way to use the polyfill, at the cost of base64 encoded module – it's ~33% bigger and cannot be loaded on demand.
 
 #### index.js
+
 ```js
 import { createIntlSegmenterPolyfill } from 'intl-segmenter-polyfill/bundled'
-
-(async function(){
-  const Segmenter = await createIntlSegmenterPolyfill();
-  const segmenter = new Segmenter("en", { granularity: 'word' });
-  const segments = segmenter.segment("foo bar baz");
+;(async function () {
+  const Segmenter = await createIntlSegmenterPolyfill()
+  const segmenter = new Segmenter('en', { granularity: 'word' })
+  const segments = segmenter.segment('foo bar baz')
+  console.log(segments)
 })()
+```
+
+#### OR using plain old <script> in html
+
+```html
+<script src="bundled.js"></script>
+<script>
+  IntlSegmenterPolyfillBundled.createIntlSegmenterPolyfill().then(function (
+    Segmenter,
+  ) {
+    const segmenter = new Segmenter('en', { granularity: 'word' })
+    const segments = segmenter.segment('foo bar baz')
+    console.log(segments)
+  })
+</script>
 ```
 
 ### Web – Rollup / Webpack wasm loader
@@ -50,6 +68,7 @@ import { createIntlSegmenterPolyfill } from 'intl-segmenter-polyfill/bundled'
 @rollup/plugin-wasm and webpack wasm-loader can be used with `createIntlSegmenterPolyfillFromFactory`
 
 #### rollup.config.js
+
 ```js
 import commonjs from '@rollup/plugin-commonjs'
 import { wasm } from '@rollup/plugin-wasm'
@@ -62,19 +81,18 @@ export default {
   },
   plugins: [commonjs(), wasm()],
 }
-
 ```
 
 #### index.js
+
 ```js
 import { createIntlSegmenterPolyfillFromFactory } from 'intl-segmenter-polyfill'
 import break_iterator from 'intl-segmenter-polyfill/break_iterator.wasm'
+;(async function () {
+  const Segmenter = await createIntlSegmenterPolyfillFromFactory(break_iterator)
 
-(async function(){
-  const Segmenter = await createIntlSegmenterPolyfillFromFactory(break_iterator);
-
-  const segmenter = new Segmenter("en", { granularity: 'word' });
-  const segments = segmenter.segment("foo bar baz");
+  const segmenter = new Segmenter('en', { granularity: 'word' })
+  const segments = segmenter.segment('foo bar baz')
 })()
 ```
 
