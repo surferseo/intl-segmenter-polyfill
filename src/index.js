@@ -68,16 +68,15 @@ const createIntlSegmenterPolyfillFromInstance = async (
       values.current = []
       const [inputPtr, inputView] = allocStr(input)
       const [localePtr] = allocStr(locale)
-      exports.break_iterator(BREAK_TYPES[granularity], localePtr, inputPtr)
+      exports.utf8_break_iterator(BREAK_TYPES[granularity], localePtr, inputPtr, inputView.length)
 
       exports.free(localePtr)
       exports.free(inputPtr)
 
-      const decoder = new TextDecoder()
       let index = 0
 
       const segments = values.current.map(([start, end, segmentType]) => {
-        const segment = decoder.decode(inputView.slice(start, end))
+        const segment = input.slice(start, end)
         const returnValue = {
           segment,
           index: index,
@@ -108,13 +107,13 @@ const getImports = (callback) => ({
     push: (start, end, segmentType) => {
       callback([start, end, segmentType])
     },
-    __sys_stat64: () => {},
+    __sys_stat64: () => { },
   },
   wasi_snapshot_preview1: {
-    proc_exit: () => {},
-    fd_close: () => {},
-    environ_sizes_get: () => {},
-    environ_get: () => {},
+    proc_exit: () => { },
+    fd_close: () => { },
+    environ_sizes_get: () => { },
+    environ_get: () => { },
   },
 })
 

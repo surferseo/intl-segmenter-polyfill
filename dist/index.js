@@ -92,10 +92,9 @@
                         _allocStr4 = _slicedToArray(_allocStr3, 1),
                         localePtr = _allocStr4[0];
 
-                    exports.break_iterator(BREAK_TYPES[granularity], localePtr, inputPtr);
+                    exports.utf8_break_iterator(BREAK_TYPES[granularity], localePtr, inputPtr, inputView.length);
                     exports.free(localePtr);
                     exports.free(inputPtr);
-                    var decoder = new TextDecoder();
                     var index = 0;
                     var segments = values.current.map(function (_ref2) {
                       var _ref3 = _slicedToArray(_ref2, 3),
@@ -103,7 +102,7 @@
                           end = _ref3[1],
                           segmentType = _ref3[2];
 
-                      var segment = decoder.decode(inputView.slice(start, end));
+                      var segment = input.slice(start, end);
                       var returnValue = {
                         segment: segment,
                         index: index,
