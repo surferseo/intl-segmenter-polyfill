@@ -1,4 +1,4 @@
-3{
+{
   "strategy": "additive",
   "featureFilters": {
     "brkitr_rules": "include",
