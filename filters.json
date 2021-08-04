@@ -1,4 +1,4 @@
-{
+3{
   "strategy": "additive",
   "featureFilters": {
     "brkitr_rules": "include",
@@ -6,7 +6,7 @@
     "cnvalias": "include",
     "ulayout": "include",
     "brkitr_dictionaries": {
-      "whitelist": ["thaidict"]
+      "whitelist": ["thaidict", "cjdict"]
     }
   }
 }
