@@ -109,3 +109,25 @@ test("Segments Thai words", async () => {
     "ได้",
   ]);
 });
+
+test("Segments Japanese words", async () => {
+  const Segmenter =
+    await require("../dist/bundled.js").createIntlSegmenterPolyfill();
+  const segments = new Segmenter("en", { granularity: "word" }).segment(
+    "チンドン屋は、チンドン太鼓と呼ばれる楽器を鳴らすなどして人目を集め、その地域の商品や店舗などの宣伝を行う日本の請負広告業である。披露目屋・広目屋・東西屋と呼ぶ地域もある。"
+  );
+  expect(segments.map(({ segment }) => segment)).toEqual([
+    "チンドン屋は",
+    "、",
+    "チンドン太鼓と呼ばれる楽器を鳴らすなどして人目を集め",
+    "、",
+    "その地域の商品や店舗などの宣伝を行う日本の請負広告業である",
+    "。",
+    "披露目屋",
+    "・",
+    "広目屋",
+    "・",
+    "東西屋と呼ぶ地域もある",
+    "。",
+  ]);
+});
