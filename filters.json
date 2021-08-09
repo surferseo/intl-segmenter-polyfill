@@ -6,7 +6,7 @@
     "cnvalias": "include",
     "ulayout": "include",
     "brkitr_dictionaries": {
-      "whitelist": ["thaidict"]
+      "whitelist": []
     }
   }
 }
