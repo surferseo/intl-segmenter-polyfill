@@ -5,8 +5,9 @@
     "brkitr_tree": "include",
     "cnvalias": "include",
     "ulayout": "include",
+    "normalization": "include",
     "brkitr_dictionaries": {
-      "whitelist": ["thaidict"]
+      "whitelist": ["thaidict", "cjdict"]
     }
   }
 }
