@@ -1,12 +1,3 @@
 {
-  "strategy": "additive",
-  "featureFilters": {
-    "brkitr_rules": "include",
-    "brkitr_tree": "include",
-    "cnvalias": "include",
-    "ulayout": "include",
-    "brkitr_dictionaries": {
-      "whitelist": ["thaidict"]
-    }
-  }
+
 }
