@@ -12,7 +12,7 @@ RUN ./runConfigureICU Linux --with-data-packaging=archive
 RUN make -j$(nproc)
 
 COPY ./filters.json /
-RUN ICU_DATA_FILTER_FILE=/filters.json ./runConfigureICU Linux --with-data-packaging=archive
+RUN  ./runConfigureICU Linux --with-data-packaging=archive
 RUN cd data && make clean && make
 RUN mkdir -p /artifacts
 RUN cp data/out/icu* /artifacts
