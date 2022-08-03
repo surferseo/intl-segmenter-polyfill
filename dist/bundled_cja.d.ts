@@ -1,16 +1,9 @@
+import { IntlSegmenterOptions, Segment } from '.';
+
 export declare const createIntlSegmenterPolyfill: () => Promise<{
-    new (locale: string, options: {
-        granularity: "word" | "grapheme";
-    }): {
-        locale: string;
-        options: {
-            granularity: "word" | "grapheme";
-        };
-        segment(input: string): {
-            segment: string;
-            index: number;
-            isWordLike: boolean;
-            breakType: "number" | "none" | "word" | "kana" | "ideo";
-        }[];
-    };
+  new (locale: string, options: IntlSegmenterOptions): {
+    locale: string;
+    options: IntlSegmenterOptions;
+    segment(input: string): Segment[];
+  };
 }>;
